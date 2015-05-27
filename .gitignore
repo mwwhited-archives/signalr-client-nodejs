@@ -1,0 +1,7 @@
+*.suo
+*.vspscc
+.ntvs_analysis.dat
+bin/
+obj/
+src/
+node_modules/
