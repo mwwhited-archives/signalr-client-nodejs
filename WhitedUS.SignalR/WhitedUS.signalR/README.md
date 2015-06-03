@@ -1,6 +1,6 @@
 ﻿# signalr-client
 
-By: [Matthew Whited](mailto:matt@whited.us?subject=signalr-client)  (c) 2015
+By: [Matthew Whited](mailto:matt@whited.us?subject=signalr-client)  (c) 2015 
 _____________________________________
 
 ## Summary
@@ -10,6 +10,8 @@ to communicate with a signalR hub over websockets.
 
 This project does not require jQuery but it also only support websockets.  Fallback to other 
 communication options such as long polling are not supported.  
+
+[Find on GitHub](https://github.com/mwwhited/signalr-client-nodejs)
 
 _____________________________________
 
