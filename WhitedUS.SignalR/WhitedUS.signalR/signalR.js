@@ -157,7 +157,7 @@ function negotiateProxies(baseUrl, hubNames, onSuccess, onError, _client) {
     
     if (negotiateUrlOptions.protocol === 'http:') {
         var negotiateResult = http.get(negotiateUrlOptions, negotiateFunction).on('error', negotiateErrorFunction);
-    } else if (negotiateUrlOptions.protocol === 'wss:') {
+    } else if (negotiateUrlOptions.protocol === 'wss:' || negotiateUrlOptions.protocol === 'https:') {
         negotiateUrlOptions.protocol = 'https:';
         var negotiateResult = https.get(negotiateUrlOptions, negotiateFunction).on('error', negotiateErrorFunction);
     } else {
