@@ -201,7 +201,8 @@ _____________________________________
 * v0.0.13: Added MIT License and released project on GitHub
     * No functional changes
     * [Code on GitHub](https://github.com/mwwhited/signalr-client-nodejs)
-
+* v0.0.14: Added HTTPS scheme support 
+	* Thanks to Guilherme Ferreira
 _____________________________________
 
 ## Known Issues
