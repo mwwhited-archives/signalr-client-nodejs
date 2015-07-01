@@ -157,7 +157,7 @@ function negotiateProxies(baseUrl, hubNames, onSuccess, onError, _client) {
     
     if (negotiateUrlOptions.protocol === 'http:') {
         var negotiateResult = http.get(negotiateUrlOptions, negotiateFunction).on('error', negotiateErrorFunction);
-    } else if (negotiateUrlOptions.protocol === 'wss:' || negotiateUrlOptions.protocol === 'https:') {
+    } else if (negotiateUrlOptions.protocol === 'wss:') {
         negotiateUrlOptions.protocol = 'https:';
         var negotiateResult = https.get(negotiateUrlOptions, negotiateFunction).on('error', negotiateErrorFunction);
     } else {
@@ -218,6 +218,29 @@ function getConnectQueryString(_client) {
     var connectQueryString = _client.url + "/connect?" + querystring.stringify(qs);
     return connectQueryString;
 }
+
+function getAbortQueryString(_client) {
+    var qs = {
+        clientProtocol: 1.4,
+        transport: "serverSentEvents",
+        connectionData: JSON.stringify(_client.hubData),
+        connectionToken: _client.connection.token
+
+    };
+    
+    if (_client.queryString) {
+        for (var propName in _client.queryString) {
+            qs[propName] = _client.queryString[propName];
+        }
+    }
+    
+    var abortQueryString = _client.url + "/abort?" + querystring.stringify(qs);
+    
+    return abortQueryString;
+    
+}
+
+
 
 function getArgValues(params) {
     var res = [];
@@ -413,6 +436,64 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
         return false;
     }
     
+    function abort() {
+        
+        if (_client.connection.state === states.connection.disconnected || _client.connection.state === states.connection.disconnecting) {
+            
+            var abortQueryString = getAbortQueryString(_client);
+            
+            var abortUrlOptions = url.parse(abortQueryString, true);
+            var requestObject = undefined;
+            
+            
+            if (abortUrlOptions.protocol === 'http:') {
+                requestObject = http;
+            } else if (abortUrlOptions.protocol === 'wss:') {
+                abortUrlOptions.protocol = 'https:';
+                requestObject = https;
+            } else {
+                handlerErrors('Protocol Error', undefined, abortUrlOptions);
+            }
+            
+            abortUrlOptions = {
+                hostname: abortUrlOptions.hostname,
+                port: abortUrlOptions.port,
+                method: 'POST',
+                path: abortUrlOptions.path
+            };
+            
+            var req = requestObject.request(abortUrlOptions, 
+            function (res) {
+                
+                //console.log('STATUS: ' + res.statusCode);
+                //console.log('HEADERS: ' + JSON.stringify(res.headers));
+
+                res.on('data', function (chunk) {
+                    //str += chunk;
+                });
+                
+                res.on('end', function () {
+                    console.log('Connection aborted');
+
+                });
+
+            });
+            
+           
+            
+            req.on('error', function (e) {
+                handlerErrors('Can\'t abort connection', e, abortUrlOptions);
+            });
+            
+            
+            
+            
+            req.end();
+            
+        }
+
+    }
+    
     _client.start = function (tryOnceAgain) {
         //connected: 3,
         //retryingConnection: 8,
@@ -511,6 +592,9 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
             if (_client.serviceHandlers.disconnected) {
                 _client.serviceHandlers.disconnected.apply(client);
             }
+            //Abort connection
+            abort();
+            
             _client.websocket.connection = undefined; //Release connection on close
         });
         connection.on('message', function (message) {
@@ -572,7 +656,7 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
             _client.start(true);
         }, handlerErrors, _client);
     };
-
+    
     if (doNotStart) { 
     }
     else {
