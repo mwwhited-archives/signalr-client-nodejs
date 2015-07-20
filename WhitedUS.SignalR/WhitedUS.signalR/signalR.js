@@ -94,7 +94,7 @@ function negotiateProxies(baseUrl, hubNames, onSuccess, onError, _client) {
     var negotiateData = "";
     var negotiateUrl = baseUrl + "/negotiate?" + querystring.stringify({
         connectionData: JSON.stringify(cleanedHubs),
-        clientProtocol: 1.3
+        clientProtocol: 1.5
     });
     var negotiateUrlOptions = url.parse(negotiateUrl, true);
     
@@ -203,6 +203,7 @@ function getBindings(baseUrl, hubNames, onSuccess, onError, _client) {
 function getConnectQueryString(_client) {
     var connectData = "";
     var qs = {
+        clientProtocol: 1.5,
         transport: "webSockets",
         connectionToken: _client.connection.token,
         connectionData: JSON.stringify(_client.hubData),
@@ -221,7 +222,7 @@ function getConnectQueryString(_client) {
 
 function getAbortQueryString(_client) {
     var qs = {
-        clientProtocol: 1.4,
+        clientProtocol: 1.5,
         transport: "serverSentEvents",
         connectionData: JSON.stringify(_client.hubData),
         connectionToken: _client.connection.token
@@ -240,6 +241,24 @@ function getAbortQueryString(_client) {
     
 }
 
+function getStartQueryString(_client) {
+    var qs = {
+        clientProtocol: 1.5,
+        transport: "webSockets",
+        connectionData: JSON.stringify(_client.hubData),
+        connectionToken: _client.connection.token
+    };
+    
+    if (_client.queryString) {
+        for (var propName in _client.queryString) {
+            qs[propName] = _client.queryString[propName];
+        }
+    }
+    
+    var startQueryString = _client.url + "/start?" + querystring.stringify(qs);
+    
+    return startQueryString;
+}
 
 
 function getArgValues(params) {
@@ -492,7 +511,85 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
             
         }
 
-    }
+    };
+    
+    function startCommunication(onSuccess, onError) {
+        
+        var startUrl = getStartQueryString(_client);
+        
+        var startUrlOptions = url.parse(startUrl, true);
+        
+        var startData = "";
+        var startFunction = function (res) {
+            res.on('data', function (chunk) {
+                startData += chunk;
+            });
+            res.on('end', function (endRes) {
+                try {
+                    if (res.statusCode == 200) {
+                        var startObj = JSON.parse(startData);
+                        onSuccess(startObj);
+                    } else if (res.statusCode == 401 || res.statusCode == 302) {
+                        if (_client.serviceHandlers.onUnauthorized) {
+                            _client.serviceHandlers.onUnauthorized(res);
+                        } else {
+                            console.log('start::Unauthorized (' + res.statusCode + ')');
+                        }
+                    } else {
+                        console.log('start::unknown (' + res.statusCode + ')');
+                    }
+                } catch (e) {
+                    onError('Parse Error', e, startData);
+                }
+            });
+            res.on('error', function (e) {
+                _client.connection.state = states.connection.bindingError;
+                if (_client.serviceHandlers.bindingError) {
+                    _client.serviceHandlers.bindingError(e);
+                } else {
+                    onError('HTTP Error', e);
+                }
+            });
+            
+            
+        }
+        
+        var startErrorFunction = function (e) {
+            _client.connection.state = states.connection.bindingError;
+            if (_client.serviceHandlers.bindingError) {
+                _client.serviceHandlers.bindingError(e);
+            } else {
+                onError('HTTP start Error', e);
+            }
+        };
+        
+        if (startUrlOptions.headers === undefined) {
+            startUrlOptions.headers = {};
+        }
+        if (_client.headers) {
+            for (var propName in _client.headers) {
+                startUrlOptions.headers[propName] = _client.headers[propName];
+            }
+        }
+        
+        if (_client.proxy && _client.proxy.host && _client.proxy.port) {
+            startUrlOptions.path = startUrlOptions.protocol + '//' + startUrlOptions.host + startUrlOptions.path;
+            startUrlOptions.headers.host = startUrlOptions.host;
+            startUrlOptions.host = _client.proxy.host;
+            startUrlOptions.port = _client.proxy.port;
+        }
+        
+        if (startUrlOptions.protocol === 'http:') {
+            var startResult = http.get(startUrlOptions, startFunction).on('error', startErrorFunction);
+        } else if (startUrlOptions.protocol === 'wss:') {
+            startUrlOptions.protocol = 'https:';
+            var startResult = https.get(startUrlOptions, startFunction).on('error', startErrorFunction);
+        } else {
+            onError('Protocol Error', undefined, startUrlOptions);
+        }
+
+
+    };
     
     _client.start = function (tryOnceAgain) {
         //connected: 3,
@@ -559,7 +656,11 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
             }
         } else {
             if (_client.serviceHandlers.connected) {
-                _client.serviceHandlers.connected.apply(client, [connection]);
+                startCommunication(function (data) {
+                    
+                    _client.serviceHandlers.connected.apply(client, [connection]);
+                },
+                handlerErrors);
             } else {
                 console.log("Connected!");
             }
