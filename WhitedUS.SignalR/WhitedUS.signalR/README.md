@@ -203,14 +203,14 @@ _____________________________________
     * [Code on GitHub](https://github.com/mwwhited/signalr-client-nodejs)
 * v0.0.14: Added HTTPS scheme support 
 	* Thanks to Guilherme Ferreira
+* v0.0.15: Update to signalR Client Protocol 1.5
+	* Thanks to Guilherme Ferreira
 _____________________________________
 
 ## Known Issues
 
 * client.Proxy settings currently only work for HTTP and not HTTPS
-
 _____________________________________
 
 _Donations for this project are graciously accepted by paypal <matt@whited.us>
 or by bitcoin 1NTVscATbu8fo6an8UMS5xiCpVCHV438sj_
-
