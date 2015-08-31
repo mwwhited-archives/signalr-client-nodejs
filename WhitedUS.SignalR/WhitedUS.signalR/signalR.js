@@ -363,7 +363,7 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
         }
         return ret;
     });
-    client.__defineGetter__('lastMessageId', function () { return _client.websocket.messageId; });
+    client.__defineGetter__('lastMessageId', function () { return _client.websocket.messageid; });
     
     client.__defineGetter__('headers', function () {
         removeUndefinedProperties(_client.headers);
@@ -415,7 +415,7 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
     _client.invoke = function (_hub, methodName, args) {
         _client.start(false);
         
-        var payload = buildPayload(_hub.data.name, methodName, args, _client.websocket.messageid++);
+        var payload = buildPayload(_hub.data.name, methodName, args, ++_client.websocket.messageid);
         //try to send message to signalR host
         sendPayload(payload);
         return payload;
