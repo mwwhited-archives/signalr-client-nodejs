@@ -379,7 +379,7 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
         return _client.queryString;
     });
     client.__defineSetter__('queryString', function (val) { mergeFrom(_client.queryString, val); });
-    
+
     client.hub = function (hubName) {
         _client.start(false);
         return _client.hubs[hubName.toLowerCase()];
@@ -408,6 +408,42 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
         var args = getArgValues(arguments);
         return hub.invoke.apply(hub, args);
     };
+
+	var callTimeout = 30000;
+	var callCallbacks = {};
+
+    client.__defineGetter__('callTimeout', function () { return callTimeout; });
+    client.__defineSetter__('callTimeout', function (val) { callTimeout = val; });
+
+    client.call = function (hubName, methodName) {
+		var nohub = typeof client.invoke.apply(client, arguments) === 'undefined';
+		return {
+			done: function (cb, timeout) { // cb(err, result)
+				if (nohub) {
+					cb('No Hub');
+					return;
+				}
+				var messageId = client.lastMessageId;
+				var timeoutId = setTimeout(
+					function () {
+						delete callCallbacks[messageId];
+						cb('Timeout');
+					},
+					timeout || callTimeout
+				);
+				callCallbacks[messageId] = function (err, result) {
+					clearTimeout(timeoutId);
+					delete callCallbacks[messageId];
+					cb(err, result);
+				};
+			}
+		};
+    };
+	function handleCallResult(messageId, err, result) {
+		var cb = callCallbacks[messageId];
+		if (cb) cb(err, result);
+	}
+	
     client.start = function () {
         _client.getBinding();
     };
@@ -709,7 +745,7 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
                     var parsed = JSON.parse(message.utf8Data);
                     
                     //{"C":"d-74C09D5E-B,1|C,0|D,1|E,0","M":[{"H":"TestHub","M":"addMessage","A":["ie","sgds"]}]}
-                    if (parsed.M) {
+                    if (parsed.hasOwnProperty('M')) {
                         for (var i = 0; i < parsed.M.length; i++) {
                             var mesg = parsed.M[i];
                             var hubName = mesg.H.toLowerCase();
@@ -724,6 +760,9 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
                             }
                         }
                     }
+					else if (parsed.hasOwnProperty('I') && (parsed.hasOwnProperty('R') || parsed.hasOwnProperty('E'))) {
+						handleCallResult(+parsed.I, parsed.E, parsed.R);
+					}
                 }
             }
         });
