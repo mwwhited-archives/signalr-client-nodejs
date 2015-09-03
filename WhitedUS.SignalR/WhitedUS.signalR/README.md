@@ -1,6 +1,6 @@
 ﻿# signalr-client
 
-By: [Matthew Whited](mailto:matt@whited.us?subject=signalr-client)  (c) 2015 
+By: [Matthew Whited](mailto:matt@whited.us?subject=signalr-client)  (c) 2015
 _____________________________________
 
 ## Summary
@@ -106,7 +106,6 @@ _see signalR-sample.js for more examples_
 
 *These are all found under client.serviceHandlers*
 
-
     bound: void function(){}
     connectFailed: void function(error){}
     connected: void function(connection){}
@@ -134,7 +133,6 @@ _see signalR-sample.js for more examples_
                            //if false the client handler will be raised.
     }
 
-
 #### Handler Unauthorized Access
 
     client.serviceHandlers.onUnauthorized = function (res) {
@@ -156,7 +154,6 @@ _see signalR-sample.js for more examples_
         return false; // Retry
     }
     
-
 _____________________________________
 
 ## Change History
@@ -205,6 +202,8 @@ _____________________________________
 	* Thanks to Guilherme Ferreira
 * v0.0.15: Update to signalR Client Protocol 1.5
 	* Thanks to Guilherme Ferreira
+* v0.0.16: Fixed lastMessageId issues 
+	* Thanks to Sergey Buturlakin
 _____________________________________
 
 ## Known Issues

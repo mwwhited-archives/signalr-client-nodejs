@@ -1,20 +1,12 @@
 ﻿//# signalr-client
-//By: [Matthew Whited](mailto:matt@whited.us?subject=signalr-client)  (c) 2014
+//By: [Matthew Whited](mailto:matt@whited.us?subject=signalr-client)  (c) 2015
+// v0.0.16
 
 //modifications made to add support for https/wss By: Anthony DiPierro
 
 //TODO: Fix HTTPS Proxy 
 // https://newspaint.wordpress.com/2012/11/05/node-js-http-and-https-proxy/
-/*
- * Matt,
- * 
- * I also believe that the proxy setting are only working correctly for when the signalr host is set for "http://127.0.0.1".  My signalr hub is at  "wss://iotbridge.azurewebsites.net/signalr".  When the proxy settings are set for fidder's standard host and port of 127.0.0.1 and 8888, and the signalr host is not local no messages arrive to fiddler.  The proxy host name is not used but the port is, thus yielding a connection that tries to go to "wss://iotbridge.azurewebsites.net/signalr:8888".  
- * Let me know if I'm too many emails.
- * 
- * thanks,
- * vince. (Vincent Miceli) vjm@orchardparksoftware.com
- */
-
+/* ~Vincent Miceli */
 //TODO: consider changing binding/start order
 
 var url = require('url'),
@@ -534,17 +526,11 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
 
             });
             
-           
-            
             req.on('error', function (e) {
                 handlerErrors('Can\'t abort connection', e, abortUrlOptions);
             });
             
-            
-            
-            
             req.end();
-            
         }
 
     };
@@ -586,8 +572,6 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
                     onError('HTTP Error', e);
                 }
             });
-            
-            
         }
         
         var startErrorFunction = function (e) {

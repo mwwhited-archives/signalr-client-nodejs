@@ -1,6 +1,6 @@
 {
     "name": "signalr-client",
-    "version": "0.0.15",
+    "version": "0.0.16",
     "description": "signalR client for node.js",
     "license": "MIT",
     "url" : "https://github.com/mwwhited/signalr-client-nodejs/",
