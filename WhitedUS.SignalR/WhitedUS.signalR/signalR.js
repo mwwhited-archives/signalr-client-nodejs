@@ -4,7 +4,7 @@
 
 //modifications made to add support for https/wss By: Anthony DiPierro
 
-//TODO: Fix HTTPS Proxy 
+//TODO: Fix HTTPS Proxy
 // https://newspaint.wordpress.com/2012/11/05/node-js-http-and-https-proxy/
 /* ~Vincent Miceli */
 //TODO: consider changing binding/start order
@@ -40,7 +40,7 @@ var states = {
 
 function toCleanHubNames(hubNames) {
     var res = [], o = 0;
-    
+
     if (hubNames.length && hubNames.length > 0) {
         for (var i = 0; i < hubNames.length; i++) {
             var p = hubNames[i];
@@ -49,7 +49,7 @@ function toCleanHubNames(hubNames) {
             }
         }
     }
-    
+
     return res;
 }
 
@@ -64,7 +64,7 @@ function removeUndefinedProperties(obj) {
 }
 function mergeFrom(target, source) {
     target = target || {};
-    
+
     if (source) {
         for (var propName in source) {
             target[propName] = source[propName];
@@ -76,20 +76,20 @@ function mergeFrom(target, source) {
 }
 
 function negotiateProxies(baseUrl, hubNames, onSuccess, onError, _client) {
-    
+
     var cleanedHubs = toCleanHubNames(hubNames);
     if (!cleanedHubs || cleanedHubs.length < 1) {
         onError('you must define at least one hub name and they must be typeof string');
         return;
     }
-    
+
     var negotiateData = "";
     var negotiateUrl = baseUrl + "/negotiate?" + querystring.stringify({
         connectionData: JSON.stringify(cleanedHubs),
         clientProtocol: 1.5
     });
     var negotiateUrlOptions = url.parse(negotiateUrl, true);
-    
+
     var negotiateFunction = function (res) {
         res.on('data', function (chunk) {
             negotiateData += chunk;
@@ -130,7 +130,7 @@ function negotiateProxies(baseUrl, hubNames, onSuccess, onError, _client) {
             onError('HTTP Negotiate Error', e);
         }
     };
-    
+
     if (negotiateUrlOptions.headers === undefined) {
         negotiateUrlOptions.headers = {};
     }
@@ -139,14 +139,14 @@ function negotiateProxies(baseUrl, hubNames, onSuccess, onError, _client) {
             negotiateUrlOptions.headers[propName] = _client.headers[propName];
         }
     }
-    
+
     if (_client.proxy && _client.proxy.host && _client.proxy.port) {
         negotiateUrlOptions.path = negotiateUrlOptions.protocol + '//' + negotiateUrlOptions.host + negotiateUrlOptions.path;
         negotiateUrlOptions.headers.host = negotiateUrlOptions.host;
         negotiateUrlOptions.host = _client.proxy.host;
         negotiateUrlOptions.port = _client.proxy.port;
     }
-    
+
     if (negotiateUrlOptions.protocol === 'http:') {
         var negotiateResult = http.get(negotiateUrlOptions, negotiateFunction).on('error', negotiateErrorFunction);
     } else if (negotiateUrlOptions.protocol === 'wss:') {
@@ -159,12 +159,12 @@ function negotiateProxies(baseUrl, hubNames, onSuccess, onError, _client) {
 
 function getBindings(baseUrl, hubNames, onSuccess, onError, _client) {
     negotiateProxies(baseUrl, hubNames, function (negotiatedOptions) {
-        
+
         if (!negotiatedOptions.TryWebSockets) {
             onError('This client only supports websockets', undefined, negotiatedOptions);
             return;
         }
-        
+
         //negotiatedOptions.Url	                    "/signalr"	        String
         //negotiatedOptions.ProtocolVersion	        "1.2"	            String
         //negotiatedOptions.TryWebSockets	        true	            Boolean
@@ -174,7 +174,7 @@ function getBindings(baseUrl, hubNames, onSuccess, onError, _client) {
         //negotiatedOptions.KeepAliveTimeout	    20	                Number
         //negotiatedOptions.DisconnectTimeout	    30	                Number
         //negotiatedOptions.TransportConnectTimeout	5	                Number
-        
+
         onSuccess({
             url: baseUrl,
             connection: {
@@ -201,13 +201,13 @@ function getConnectQueryString(_client) {
         connectionData: JSON.stringify(_client.hubData),
         tid: 10
     };
-    
+
     if (_client.queryString) {
         for (var propName in _client.queryString) {
             qs[propName] = _client.queryString[propName];
         }
     }
-    
+
     var connectQueryString = _client.url + "/connect?" + querystring.stringify(qs);
     return connectQueryString;
 }
@@ -220,17 +220,17 @@ function getAbortQueryString(_client) {
         connectionToken: _client.connection.token
 
     };
-    
+
     if (_client.queryString) {
         for (var propName in _client.queryString) {
             qs[propName] = _client.queryString[propName];
         }
     }
-    
+
     var abortQueryString = _client.url + "/abort?" + querystring.stringify(qs);
-    
+
     return abortQueryString;
-    
+
 }
 
 function getStartQueryString(_client) {
@@ -240,22 +240,22 @@ function getStartQueryString(_client) {
         connectionData: JSON.stringify(_client.hubData),
         connectionToken: _client.connection.token
     };
-    
+
     if (_client.queryString) {
         for (var propName in _client.queryString) {
             qs[propName] = _client.queryString[propName];
         }
     }
-    
+
     var startQueryString = _client.url + "/start?" + querystring.stringify(qs);
-    
+
     return startQueryString;
 }
 
 
 function getArgValues(params) {
     var res = [];
-    
+
     if (params.length && params.length > 1) {
         for (var i = 1; i < params.length; i++) {
             var p = params[i];
@@ -265,7 +265,7 @@ function getArgValues(params) {
             res[i - 1] = p;
         }
     }
-    
+
     return res;
 }
 
@@ -281,7 +281,7 @@ function buildPayload(hubName, methodName, args, messageId) {
     var data = {
         H: hubName,
         M: methodName,
-        A: args, 
+        A: args,
         I: messageId
     };
     var payload = JSON.stringify(data);
@@ -317,12 +317,12 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
             disconnected: undefined,    // void function(){}
             onerror: undefined,         // void function(error){}
             messageReceived: undefined, // bool function(message){ return true /* if handled */}
-            bindingError: undefined,    // function(error) {} 
-            onUnauthorized: undefined,  // function(res) {} 
+            bindingError: undefined,    // function(error) {}
+            onUnauthorized: undefined,  // function(res) {}
             reconnected: undefined,     // void function(connection){}
             reconnecting: undefined     // function(retry) { return false; } */
         },
-        
+
         // https://github.com/Worlize/WebSocket-Node
         websocket: {
             client: new WebSocketClient(),
@@ -332,7 +332,7 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
             reconnectCount: 0
         }
     };
-    
+
     client.__defineGetter__('url', function () { return _client.url; });
     client.__defineGetter__('state', function () {
         var result = {
@@ -341,13 +341,13 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
         };
         return result;
     });
-    
+
     client.__defineGetter__('handlers', function () { return _client.handlers; });
     client.__defineSetter__('handlers', function (val) { mergeFrom(_client.handlers, val); });
-    
+
     client.__defineGetter__('serviceHandlers', function () { return _client.serviceHandlers; });
     client.__defineSetter__('serviceHandlers', function (val) { mergeFrom(_client.serviceHandlers, val); });
-    
+
     client.__defineGetter__('hubs', function () {
         var ret = [], x = 0;
         for (h in _client.hubs) {
@@ -356,16 +356,16 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
         return ret;
     });
     client.__defineGetter__('lastMessageId', function () { return _client.websocket.messageid; });
-    
+
     client.__defineGetter__('headers', function () {
         removeUndefinedProperties(_client.headers);
         return _client.headers;
     });
     client.__defineSetter__('headers', function (val) { mergeFrom(_client.headers, val); });
-    
+
     client.__defineGetter__('proxy', function () { return _client.proxy; });
     client.__defineSetter__('proxy', function (val) { mergeFrom(_client.proxy, val); });
-    
+
     client.__defineGetter__('queryString', function () {
         removeUndefinedProperties(_client.queryString);
         return _client.queryString;
@@ -384,8 +384,8 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
         var method = handler[methodName.toLowerCase()] = callback;
     };
     client.end = function () {
-        if ((_client.connection.state == states.connection.connecting 
-            || _client.connection.state == states.connection.connected) 
+        if ((_client.connection.state == states.connection.connecting
+            || _client.connection.state == states.connection.connected)
             && _client.websocket.connection) {
             _client.connection.state = states.connection.disconnecting;
             var connection = _client.websocket.connection;
@@ -439,16 +439,16 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
     client.start = function () {
         _client.getBinding();
     };
-    
+
     _client.invoke = function (_hub, methodName, args) {
         _client.start(false);
-        
+
         var payload = buildPayload(_hub.data.name, methodName, args, ++_client.websocket.messageid);
         //try to send message to signalR host
         sendPayload(payload);
         return payload;
     };
-    
+
     function sendPayload(payload) {
         if (_client.websocket.connection) {
             _client.websocket.connection.send(payload);
@@ -482,17 +482,17 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
         }
         return false;
     }
-    
+
     function abort() {
-        
+
         if (_client.connection.state === states.connection.disconnected || _client.connection.state === states.connection.disconnecting) {
-            
+
             var abortQueryString = getAbortQueryString(_client);
-            
+
             var abortUrlOptions = url.parse(abortQueryString, true);
             var requestObject = undefined;
-            
-            
+
+
             if (abortUrlOptions.protocol === 'http:') {
                 requestObject = http;
             } else if (abortUrlOptions.protocol === 'wss:') {
@@ -501,46 +501,46 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
             } else {
                 handlerErrors('Protocol Error', undefined, abortUrlOptions);
             }
-            
+
             abortUrlOptions = {
                 hostname: abortUrlOptions.hostname,
                 port: abortUrlOptions.port,
                 method: 'POST',
                 path: abortUrlOptions.path
             };
-            
-            var req = requestObject.request(abortUrlOptions, 
+
+            var req = requestObject.request(abortUrlOptions,
             function (res) {
-                
+
                 //console.log('STATUS: ' + res.statusCode);
                 //console.log('HEADERS: ' + JSON.stringify(res.headers));
 
                 res.on('data', function (chunk) {
                     //str += chunk;
                 });
-                
+
                 res.on('end', function () {
                     console.log('Connection aborted');
 
                 });
 
             });
-            
+
             req.on('error', function (e) {
                 handlerErrors('Can\'t abort connection', e, abortUrlOptions);
             });
-            
+
             req.end();
         }
 
     };
-    
+
     function startCommunication(onSuccess, onError) {
-        
+
         var startUrl = getStartQueryString(_client);
-        
+
         var startUrlOptions = url.parse(startUrl, true);
-        
+
         var startData = "";
         var startFunction = function (res) {
             res.on('data', function (chunk) {
@@ -573,7 +573,7 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
                 }
             });
         }
-        
+
         var startErrorFunction = function (e) {
             _client.connection.state = states.connection.bindingError;
             if (_client.serviceHandlers.bindingError) {
@@ -582,7 +582,7 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
                 onError('HTTP start Error', e);
             }
         };
-        
+
         if (startUrlOptions.headers === undefined) {
             startUrlOptions.headers = {};
         }
@@ -591,14 +591,14 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
                 startUrlOptions.headers[propName] = _client.headers[propName];
             }
         }
-        
+
         if (_client.proxy && _client.proxy.host && _client.proxy.port) {
             startUrlOptions.path = startUrlOptions.protocol + '//' + startUrlOptions.host + startUrlOptions.path;
             startUrlOptions.headers.host = startUrlOptions.host;
             startUrlOptions.host = _client.proxy.host;
             startUrlOptions.port = _client.proxy.port;
         }
-        
+
         if (startUrlOptions.protocol === 'http:') {
             var startResult = http.get(startUrlOptions, startFunction).on('error', startErrorFunction);
         } else if (startUrlOptions.protocol === 'wss:') {
@@ -610,19 +610,19 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
 
 
     };
-    
+
     _client.start = function (tryOnceAgain) {
         //connected: 3,
         //retryingConnection: 8,
         //connecting: 2,
-        if (_client.connection.state == states.connection.connected 
-            || _client.connection.state == states.connection.retryingConnection 
+        if (_client.connection.state == states.connection.connected
+            || _client.connection.state == states.connection.retryingConnection
             || _client.connection.state == states.connection.connecting) {
             return true;
         }
         //unbound: 0,
         //bindingError: 9,
-        else if (_client.connection.state == states.connection.bindingError 
+        else if (_client.connection.state == states.connection.bindingError
             || _client.connection.state == states.connection.unbound) {
             if (!tryOnceAgain) {
                 _client.getBinding();
@@ -635,13 +635,13 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
         //disconnected: 5,
         //connectFailed: 6,
         //errorOccured: 7,
-        else if (_client.connection.state == states.connection.bound 
-            || _client.connection.state == states.connection.disconnecting 
-            || _client.connection.state == states.connection.disconnected 
-            || _client.connection.state == states.connection.connectFailed 
+        else if (_client.connection.state == states.connection.bound
+            || _client.connection.state == states.connection.disconnecting
+            || _client.connection.state == states.connection.disconnected
+            || _client.connection.state == states.connection.connectFailed
             || _client.connection.state == states.connection.errorOccured) {
             _client.connection.state = states.connection.connecting;
-            
+
             //connect to websockets
             var connectQueryString = getConnectQueryString(_client);
             _client.websocket.client.connect(connectQueryString, undefined, undefined, _client.headers);
@@ -649,9 +649,9 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
         }
         return true;
     };
-    
+
     _client.websocket.client.on('connectFailed', function (error) {
-        if (_client.connection.state == states.connection.retryingConnection 
+        if (_client.connection.state == states.connection.retryingConnection
             && scheduleReconnection(false)) {
         } else {
             _client.connection.state = states.connection.connectFailed;
@@ -665,10 +665,10 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
     _client.websocket.client.on('connect', function (connection) {
         _client.websocket.connection = connection;
         _client.websocket.messageid = 0; //Reset MessageID on new connection
-        
+
         //Note: check for reconnecting
         if (_client.connection.state == states.connection.retryingConnection) {
-            //Note: reconnected event  
+            //Note: reconnected event
             if (_client.serviceHandlers.reconnected) {
                 _client.serviceHandlers.reconnected.apply(client, [connection]);
             } else {
@@ -677,7 +677,7 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
         } else {
             if (_client.serviceHandlers.connected) {
                 startCommunication(function (data) {
-                    
+
                     _client.serviceHandlers.connected.apply(client, [connection]);
                 },
                 handlerErrors);
@@ -688,7 +688,7 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
         connection.on('error', function (error) {
             _client.websocket.connection = undefined;
             _client.connection.state = states.connection.errorOccured;
-            
+
             //Note: Add support for automatic retry
             if (error.code == "ECONNRESET") {
                 _client.connection.state = states.connection.retryingConnection;
@@ -715,7 +715,7 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
             }
             //Abort connection
             abort();
-            
+
             _client.websocket.connection = undefined; //Release connection on close
         });
         connection.on('message', function (message) {
@@ -727,7 +727,7 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
                 //{"C":"d-8F1AB453-B,0|C,0|D,1|E,0","S":1,"M":[]}
                 if (message.type === 'utf8' && message.utf8Data != "{}") {
                     var parsed = JSON.parse(message.utf8Data);
-                    
+
                     //{"C":"d-74C09D5E-B,1|C,0|D,1|E,0","M":[{"H":"TestHub","M":"addMessage","A":["ie","sgds"]}]}
                     if (parsed.hasOwnProperty('M')) {
                         for (var i = 0; i < parsed.M.length; i++) {
@@ -744,44 +744,44 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
                             }
                         }
                     }
-					else if (parsed.hasOwnProperty('I') && (parsed.hasOwnProperty('R') || parsed.hasOwnProperty('E'))) {
+					else if (parsed.hasOwnProperty('I')) {
 						handleCallResult(+parsed.I, parsed.E, parsed.R);
 					}
                 }
             }
         });
     });
-    
+
     _client.getBinding = function () {
         getBindings(baseUrl, hubs, function (bindings) {
-            
+
             _client.hubData = bindings.hubs;
-            
-            //hubs:  
+
+            //hubs:
             for (var i = 0; i < bindings.hubs.length; i++) {
                 var hubData = bindings.hubs[i];
                 _client.hubs[hubData.name] = new hubInterface(_client, hubData);
             }
-            
+
             //timeouts: { keepAlive: disconnect: connect: },
             _client.timeouts.keepAlive = bindings.timeouts.keepAlive;
             _client.timeouts.disconnect = bindings.timeouts.disconnect;
             _client.timeouts.connect = bindings.timeouts.connect;
-            
+
             //connection: { token: id: },
             _client.connection.state = states.connection.bound;
             _client.connection.id = bindings.connection.id;
             _client.connection.token = bindings.connection.token;
-            
+
             if (_client.serviceHandlers.bound) {
                 _client.serviceHandlers.bound.apply(client);
             }
-            
+
             _client.start(true);
         }, handlerErrors, _client);
     };
-    
-    if (doNotStart) { 
+
+    if (doNotStart) {
     }
     else {
         _client.getBinding();
@@ -795,7 +795,7 @@ function hubInterface(_client, hubData) {
         client: _client,
         data: hubData
     };
-    
+
     hub.__defineGetter__('name', function () { return _hub.data.name; });
     hub.__defineGetter__('client', function () { return _hub.client.pub; });
     hub.__defineGetter__('handlers', function () { return _hub.client.handlers[_hub.data.name]; });
