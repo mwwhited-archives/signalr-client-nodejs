@@ -64,7 +64,7 @@ _see signalR-sample.js for more examples_
 		}
 	};
 
-### Calling methods on the signalR hub
+### Invoking methods on the signalR hub (no return values)
 
 #### From the client instance
 
@@ -81,6 +81,38 @@ _see signalR-sample.js for more examples_
 		'Send',	// Method Name (case insensitive) 
 		'hub', 'invoked from hub' //additional parameters to match called signature
 		);
+
+
+### Calling methods on the signalR hub (with async return values)
+
+#### From the client instance
+
+    client.call(
+		'TestHub', // Hub Name (case insensitive)
+		'Send',	// Method Name (case insensitive)
+		'client', 'invoked from client' //additional parameters to match signature
+		)
+	 	.done(function (err, result) {
+	 		if (!err)  {
+	 			console.log("call returned: ", result);
+	 		}
+	 	
+	 	});
+
+#### From the hub instance
+
+	var hub = client.hub('TestHub'); // Hub Name (case insensitive)
+	hub.call(
+		'Send',	// Method Name (case insensitive) 
+		'hub', 'invoked from hub' //additional parameters to match called signature
+		)
+	 	.done(function (err, result) {
+	 		if (!err)  {
+	 			console.log("call returned: ", result);
+	 		}
+	 	});
+
+
 
 ### Additional Features
 
