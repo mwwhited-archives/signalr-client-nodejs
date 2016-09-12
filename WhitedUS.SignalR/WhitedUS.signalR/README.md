@@ -236,6 +236,8 @@ _____________________________________
 	* Thanks to Guilherme Ferreira
 * v0.0.16: Fixed lastMessageId issues 
 	* Thanks to Sergey Buturlakin
+* v0.0.17: Fixed negotiation error handing
+    * Thanks to Patrick Hampson
 _____________________________________
 
 ## Known Issues

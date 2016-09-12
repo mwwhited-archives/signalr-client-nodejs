@@ -1,6 +1,6 @@
 ﻿//# signalr-client
-//By: [Matthew Whited](mailto:matt@whited.us?subject=signalr-client)  (c) 2015
-// v0.0.16
+//By: [Matthew Whited](mailto:matt@whited.us?subject=signalr-client)  (c) 2016
+// v0.0.17
 
 //modifications made to add support for https/wss By: Anthony DiPierro
 
