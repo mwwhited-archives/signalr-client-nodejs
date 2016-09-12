@@ -1,6 +1,6 @@
 ﻿# signalr-client
 
-By: [Matthew Whited](mailto:matt@whited.us?subject=signalr-client)  (c) 2015
+By: [Matthew Whited](mailto:matt@whited.us?subject=signalr-client)  (c) 2016
 _____________________________________
 
 ## Summary
