@@ -15,7 +15,7 @@
         "url": "https://www.linkedin.com/in/mwwhited"
     },
     "dependencies": {
-        "websocket": "^1.0.17"
+        "websocket": "^1.0.26"
     },
     "engines": {
         "node": "*"
