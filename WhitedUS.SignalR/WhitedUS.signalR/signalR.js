@@ -778,7 +778,13 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
             }
 
             _client.start(true);
-        }, (_client.serviceHandlers.onerror ? client.serviceHandlers.onerror : handlerErrors), _client);
+        }, function(errorMessage, exception, errorData) {
+            if (_client.serviceHandlers.onerror) {
+                _client.serviceHandlers.onerror(errorMessage, exception, errorData);
+            } else {
+                handlerErrors(errorMessage, exception, errorData);
+            }
+        }, _client);
     };
 
     if (doNotStart) {
