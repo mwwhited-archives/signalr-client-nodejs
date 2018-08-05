@@ -238,7 +238,7 @@ _____________________________________
 	* Thanks to Sergey Buturlakin
 * v0.0.17: Fixed negotiation error handing
     * Thanks to Patrick Hampson 
-* v.0.18: Updated Websockets version and error handler binding fixed
+* v0.0.18: Updated Websockets version and error handler binding fixed
 	* Thanks https://github.com/jd4ever
 	* Thanks Adrian Slouch https://github.com/n0mad01 
 
