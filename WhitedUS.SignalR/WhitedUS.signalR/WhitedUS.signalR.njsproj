@@ -9,6 +9,7 @@
     <SccProvider>SAK</SccProvider>
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
+    <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -36,6 +37,7 @@
     <Compile Include="signalR-sample.js" />
     <Compile Include="signalR.js" />
     <Content Include="LICENSE" />
+    <Content Include="package-lock.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />
     <Content Include=".npmignore" />
