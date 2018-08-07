@@ -240,7 +240,7 @@ _____________________________________
     * Thanks to Patrick Hampson 
 * v0.0.18: Updated Websockets version and error handler binding fixed
 	* Thanks https://github.com/jd4ever
-	* Thanks Adrian Slouch https://github.com/n0mad01 
+	* Thanks Adrian Soluch https://github.com/n0mad01 
 
 _____________________________________
 
