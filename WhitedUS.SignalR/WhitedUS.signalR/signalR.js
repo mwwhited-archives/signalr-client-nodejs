@@ -342,6 +342,8 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
         return result;
     });
 
+    client.__defineGetter__('connection', function () { return _client.connection; });
+
     client.__defineGetter__('handlers', function () { return _client.handlers; });
     client.__defineSetter__('handlers', function (val) { mergeFrom(_client.handlers, val); });
 
