@@ -385,6 +385,12 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
         }
         var method = handler[methodName.toLowerCase()] = callback;
     };
+    client.off = function (hubName, methodName) {
+        var handler = _client.handlers[hubName.toLowerCase()];
+        if (handler) {
+            delete handler[methodName.toLowerCase()];
+        }
+    };
     client.end = function () {
         if ((_client.connection.state == states.connection.connecting
             || _client.connection.state == states.connection.connected)
