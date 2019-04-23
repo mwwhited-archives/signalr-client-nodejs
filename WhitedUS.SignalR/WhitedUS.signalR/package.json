@@ -3,7 +3,7 @@
     "version": "0.0.18",
     "description": "signalR client for node.js",
     "license": "MIT",
-    "url" : "https://github.com/mwwhited/signalr-client-nodejs/",
+    "url": "https://github.com/mwwhited/signalr-client-nodejs/",
     "main": "./signalR.js",
     "keywords": [
         "signalr",
@@ -15,7 +15,7 @@
         "url": "https://www.linkedin.com/in/mwwhited"
     },
     "dependencies": {
-        "websocket": "^1.0.26"
+        "websocket": "^1.0.28"
     },
     "engines": {
         "node": "*"
