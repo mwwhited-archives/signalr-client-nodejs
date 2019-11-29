@@ -152,7 +152,7 @@ function negotiateProxies(baseUrl, hubNames, onSuccess, onError, _client) {
     } else if (negotiateUrlOptions.protocol === 'wss:') {
         negotiateUrlOptions.protocol = 'https:';
         var negotiateResult = https.get(negotiateUrlOptions, negotiateFunction).on('error', negotiateErrorFunction);
-    } else {
+    } else if(negotiateUrlOptions.protocol !== 'https:') {
         onError('Protocol Error', undefined, negotiateUrlOptions);
     }
 }
@@ -500,7 +500,7 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
             } else if (abortUrlOptions.protocol === 'wss:') {
                 abortUrlOptions.protocol = 'https:';
                 requestObject = https;
-            } else {
+            } else if (abortUrlOptions.protocol !== 'https:') {
                 handlerErrors('Protocol Error', undefined, abortUrlOptions);
             }
 
@@ -606,7 +606,7 @@ function clientInterface(baseUrl, hubs, reconnectTimeout, doNotStart) {
         } else if (startUrlOptions.protocol === 'wss:') {
             startUrlOptions.protocol = 'https:';
             var startResult = https.get(startUrlOptions, startFunction).on('error', startErrorFunction);
-        } else {
+        } else if(startUrlOptions.protocol !== 'https:') {
             onError('Protocol Error', undefined, startUrlOptions);
         }
 
