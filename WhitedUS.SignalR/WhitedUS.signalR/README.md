@@ -1,6 +1,6 @@
 ﻿# signalr-client
 
-By: [Matthew Whited](mailto:matt@whited.us?subject=signalr-client)  (c) 2018
+By: [Matthew Whited](mailto:matt@whited.us?subject=signalr-client)  (c) 2018-2020
 _____________________________________
 
 ## Summary
@@ -240,8 +240,14 @@ _____________________________________
     * Thanks to Patrick Hampson 
 * v0.0.18: Updated Websockets version and error handler binding fixed
 	* Thanks https://github.com/jd4ever
-	* Thanks Adrian Soluch https://github.com/n0mad01 
-
+	* Thanks Adrian Soluch https://github.com/n0mad01  
+* v0.0.19: Exposed getter for connection 
+    * Thanks Lukas Weber
+* v0.0.20: Updated with various pull requests. 
+	* Thanks [Themis Papameletiou(https://github.com/themicp/) for adding the .off(..)
+    * Thanks [Dennis Pan](https://github.com/DennisPan) for updating the version of websockets
+    * Thanks [arnoldpistorius](https://github.com/arnoldpistorius) for adding support for the url schema to be https
+    * 
 _____________________________________
 
 ## Known Issues
@@ -250,4 +256,3 @@ _____________________________________
 _____________________________________
 
 _Donations for this project are graciously accepted by paypal <matt@whited.us>
-or by bitcoin 1NTVscATbu8fo6an8UMS5xiCpVCHV438sj_
