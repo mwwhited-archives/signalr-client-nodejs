@@ -16,3 +16,13 @@ For browser support use the offical client from Microsoft.
 I am not actively working on a project using this library… as such I don’t really 
 have the time to maintain this code base.  If anyone would like to help contribute
 to this project please feel free to contact me.
+
+## This is not longer actively supported
+
+Please checkout the following projects they seem to have active interest.
+
+https://www.npmjs.com/package/@microsoft/signalr
+https://www.npmjs.com/package/signalr
+
+-Thanks,
+Matt
